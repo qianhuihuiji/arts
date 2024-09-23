@@ -1,40 +1,56 @@
 
 public class Demo {
-    private static int maxW = Integer.MIN_VALUE; //存储背包中物品总重量的最大值
-    private static int[] items = {2,2,4,6,3}; // 物品重量
-    private static int total = 5; // 物品个数
-    private static int totalWeight = 10; // 背包承受的最大重量
-    private static boolean[][] lookup = new boolean[5][10]; // 记录状态
+    private static int maxV = Integer.MIN_VALUE; // 结果放到maxV中
+    private static int[] weights = {2,2,4,6,2}; // 物品重量
+    private static int[] values = {3,4,8,9,6}; // 物品的价值
+    private static int n = 5; // 物品个数
+    private static int w = 9; // 背包承受的最大重量
+    private static int[] states = new int[w +1]; // 记录状态
 
     public static void main(String[] args) {
-        // 假设背包可承受重量 5，物品个数 5，数组 items 存储物品重量：
-        pack(0, 0);
-
-        System.out.println("最大重量:" + maxW);
+        pack();
+        System.out.println(maxV);
     }
 
-    private static void pack(int currentItem, int currentWeight) {
-        // currentWeight == totalWeight 表示已装满
-        // currentItem == total 表示物品已遍历完
-        if (currentWeight == totalWeight || currentItem == total) {
-            if (currentWeight > maxW) maxW = currentWeight;
+    private static void pack() {
+        // 初始化为-1，区别出不可达状态
+            for (int j = 0; j < w; j++) {
+                states[j] = -1;
+            }
 
-            return;
+        // 第一个物品特殊处理
+        // 不放
+        states[0] = 0;
+        if(weights[0] <= w) {
+            states[weights[0]] = values[0];
         }
 
-        // 判断是否已经记录过该状态
-        // 如果记录过的话，maxW 也已经被判断处理过了
-        if (lookup[currentItem][currentWeight]) return;
-        // 记录状态
-        lookup[currentItem][currentWeight] = true;
+        for(int i = 1; i < weights.length; i++) {
+            // 不放
+            // 放，前提是放得进
+            for(int j = w-weights[i]; j >=0; j--) {
+                if(states[j] >= 0) {
+                    int v = states[j] + values[i];
+                    if(v > states[j+weights[i]]) {
+                        states[j+weights[i]] = v;
+                    }
+                }
+            }
+        }
+    }
 
-        // 不装入当前物品，因此 currentWeight 不变
-        pack(currentItem+1, currentWeight);
-
-        // 只有在装入当前物品不超重的前提下，才会装入
-        if (currentWeight + items[currentItem] <= totalWeight) {
-            // 装入当前物品，因此 currentWeight 要加上当前物品的重量
-            pack(currentItem+1, currentWeight + items[currentItem]);
+    private static void f(int i, int cw, int cv) {
+        if (i == n || cw == w) {
+            if(cv>maxV) {
+                maxV = cv;
+            }
+            return;
+        }
+        // 不放
+        f(i+1,cw,cv);
+        // 放，前提是放得进
+        if(cw+ weights[i] <= w) {
+            f(i+1,cw+ weights[i],cv+ values[i]);
         }
     }
 }
