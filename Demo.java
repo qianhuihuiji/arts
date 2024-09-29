@@ -1,32 +1,31 @@
 public class Demo {
-    private static int minCount = Integer.MAX_VALUE;
-    private static int[] values = {1, 3, 5};
-    private static int[] mem = new int[10];
-
-
+    
     public static void main(String[] args) {
-        System.out.println(f2(9));
+        System.out.println(climbStairs(2));
     }
 
-
-    private static int f2(int val) {
-        if (val == 1 || val == 3 || val == 5) { // 剩下的钱如果能一次结清，可以用 set 进行优化
-            return 1;
+    public static int climbStairs(int n) {
+        int[] mem = new int[n + 1];
+        mem[1] = 1;
+        if (n >= 2) {
+            mem[2] = 2;
         }
-        if (val <= 0) {
-            return Integer.MAX_VALUE;
+        return f(n, mem);
+    }
+
+    private static int f(int n, int[] mem) {
+        if (n <= 0) {
+            return 0;
         }
 
-        if (mem[val] > 0) {
-            return mem[val];
+        if (mem[n] > 0) {
+            return mem[n];
         }
 
-        int i = 1 + min(f2(val - 1), f2(val - 3), f2(val - 5));
-        mem[val] = i;
+        int i = f(n - 1, mem) + f(n - 2, mem);
+        mem[n] = i;
+
         return i;
     }
 
-    private static int min(int a, int b, int c) {
-        return Math.min(Math.min(a, b), c);
-    }
 }
